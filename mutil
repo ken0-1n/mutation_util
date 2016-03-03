@@ -1,0 +1,30 @@
+#! /usr/bin/env python
+
+from mutil.run import *
+import argparse
+
+#
+# top level parser
+#
+parser = argparse.ArgumentParser(prog = "mutil")
+parser.add_argument("--version", action = "version", version = "MutationUtil-0.1.0")
+subparsers = parser.add_subparsers()
+
+####################
+# compare
+parse_parser = subparsers.add_parser("comparison")
+parse_parser.add_argument( '-i', '--input', help = 'mutation list', type = str, default = None, required = True )
+parse_parser.add_argument( '-d', '--database', help = 'fairhose maf', type = str, default = None, required = True )
+parse_parser.add_argument( '-o', '--output', help = 'output directory', type = str, default = None, required = True)
+parse_parser.add_argument( '-m', '--mapchain', help = 'map chain file', type = str, default = None)
+parse_parser.add_argument( '-e', '--ebpval', help = 'EBCall P-value', type = float, default = 0.0)
+parse_parser.add_argument( '-f', '--fishpval', help = 'Fisher test P-value', type = float, default = 0.0)
+parse_parser.add_argument( '-r', '--realignpval', help = 'Realignment P-value', type = float, default = 0.0)
+parse_parser.add_argument( '-t', '--tcount', help = 'read count of tumor', type = int, default = -1)
+parse_parser.add_argument( '-n', '--ncount', help = 'read count of normal', type = int, default = -1)
+
+parse_parser.set_defaults(func = run_compare)
+
+args = parser.parse_args()
+args.func(args)
+
