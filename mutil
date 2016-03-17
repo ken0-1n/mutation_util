@@ -22,6 +22,8 @@ parse_parser.add_argument( '-f', '--fishpval', help = 'Fisher test P-value', typ
 parse_parser.add_argument( '-r', '--realignpval', help = 'Realignment P-value', type = float, default = 0.0)
 parse_parser.add_argument( '-t', '--tcount', help = 'read count of tumor', type = int, default = -1)
 parse_parser.add_argument( '-n', '--ncount', help = 'read count of normal', type = int, default = -1)
+parse_parser.add_argument( '-g', '--func_ref', help = 'select [downstream,exonic,intergenic,intronic,ncRNA_exonic,ncRNA_intronic,splicing,upstream,upstream;downstream,UTR3,UTR5]', type = str, default = "downstream,exonic,intergenic,intronic,ncRNA_exonic,ncRNA_intronic,splicing,upstream,upstream;downstream,UTR3,UTR5")
+parse_parser.add_argument( '-1', '--gene_ref', help = 'select gene name', type = str, default = "")
 
 parse_parser.set_defaults(func = run_compare)
 

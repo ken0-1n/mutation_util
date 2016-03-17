@@ -15,7 +15,7 @@ def lift_over (input_file, output_prefix, map_chain):
 
             if (count == 2):
                 NCBI_Build = F[3]
-                if (NCBI_Build == "37" or NCBI_Build == "hg19"):
+                if (NCBI_Build == "37" or NCBI_Build == "hg19" or NCBI_Build == "GRCh37" or NCBI_Build == "GRCh37-lite"):
                     liftOverFlag = False
                     break
                 elif (NCBI_Build == "36" or NCBI_Build == "hg18"):
@@ -103,7 +103,8 @@ def make_tabix_db(input_file, output_prefix):
     hout = open(output_prefix + ".tmp.bed", 'w')
     with open(input_file, 'r') as hin:
         for line in hin:
-            F = line.rstrip('\n').split('\t')
+            line = line.rstrip('\n')
+            F = line.split('\t')
             Chromosome = F[4]
             if Chromosome == "Chromosome": continue 
 
@@ -121,16 +122,26 @@ def make_tabix_db(input_file, output_prefix):
             if t_alt_count_idx != -1:
                 t_alt_count = F[t_alt_count_idx]
           
-            start = Start_position
-            if Variant_Type in ('SNP','DEL',):
+            if Variant_Type == 'DNP':
                 start = int(Start_position) - 1
-    
-            if Reference_Allele != Tumor_Seq_Allele1:
-                print >> hout, Chromosome +'\t'+ str(start) +'\t'+ End_position +'\t'+ Reference_Allele +'\t'+ Tumor_Seq_Allele1 +'\t'+ Tumor_Sample_Barcode +"\t"+ t_ref_count +'\t'+ t_alt_count +'\t'
-    
-            if Reference_Allele != Tumor_Seq_Allele2:
-                print >> hout, Chromosome +'\t'+ str(start) +'\t'+ End_position +'\t'+ Reference_Allele +'\t'+ Tumor_Seq_Allele2 +'\t'+ Tumor_Sample_Barcode +"\t"+ t_ref_count +'\t'+ t_alt_count +'\t'
-           
+                end = int(End_position)
+                allist1 = list(Tumor_Seq_Allele1)
+                allist2 = list(Tumor_Seq_Allele2)
+                for i, value in enumerate(list(Reference_Allele)):
+                    if value != allist1[i]:
+                        print >> hout, Chromosome +'\t'+ str(start + i) +'\t'+ str(end + i) +'\t'+ value +'\t'+ allist1[i] +'\t'+ Tumor_Sample_Barcode +"\t"+ t_ref_count +'\t'+ t_alt_count +"\t"+ line
+                    if value != allist2[i]:
+                        print >> hout, Chromosome +'\t'+ str(start + i) +'\t'+ str(end + i) +'\t'+ value +'\t'+ allist2[i] +'\t'+ Tumor_Sample_Barcode +"\t"+ t_ref_count +'\t'+ t_alt_count +"\t"+ line
+            else:
+                start = Start_position
+                if Variant_Type in ('SNP','DEL'):
+                    start = int(Start_position) - 1
+
+                if Reference_Allele != Tumor_Seq_Allele1:
+                    print >> hout, Chromosome +'\t'+ str(start) +'\t'+ End_position +'\t'+ Reference_Allele +'\t'+ Tumor_Seq_Allele1 +'\t'+ Tumor_Sample_Barcode +"\t"+ t_ref_count +'\t'+ t_alt_count +"\t"+ line
+                if Reference_Allele != Tumor_Seq_Allele2:
+                    print >> hout, Chromosome +'\t'+ str(start) +'\t'+ End_position +'\t'+ Reference_Allele +'\t'+ Tumor_Seq_Allele2 +'\t'+ Tumor_Sample_Barcode +"\t"+ t_ref_count +'\t'+ t_alt_count +"\t"+ line
+          
         hout.close()
    
     
@@ -175,10 +186,12 @@ def exact_alignment(seq1, seq2):
 
 
 ###############################################
-def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval, realignpval, tcount, ncount):
+def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval, realignpval, tcount, ncount, func_ref, gene_ref):
 
     # if not os.path.exists(input_file):
     #     raise ValueError("file not exists: " + input_file)
+
+    if not os.path.isdir(output_dir): os.mkdir(output_dir)
     
     base, ext = os.path.splitext( os.path.basename(data_file) )
     output_prefix = output_dir +"/"+ base
@@ -187,16 +200,21 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
    
     make_tabix_db(new_data_file, output_prefix)
     tb = pysam.TabixFile(output_prefix +".bed.gz")
+    db_file = output_prefix +".tmp.bed"
     
     base, ext = os.path.splitext( os.path.basename(input_file) )
     result_file = output_dir +"/"+ base +"_firehose.txt"
-    hout = open(result_file, 'w')
-   
+    result_file3 = output_dir +"/"+ base +"_firehose_filtered.txt"
+    result_file2 = output_prefix +"firehose_only.maf.txt"
+    result_file4 = output_prefix +"firehose_only.maf_filtered.txt"
+ 
     fisher_idx = -1
     ebcall_idx = -1
     realign_idx = -1
     tcount_idx = -1
     ncount_idx = -1
+    funcgene_idx = -1
+    gene_idx = -1
     # check header line and NCBI_build
     with open(input_file, 'r') as hin:
         for line in hin:
@@ -212,8 +230,16 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
                     tcount_idx = i
                 elif v == "variantPairNum_normal":
                     ncount_idx = i
+                elif v == "Func.refGene":
+                    funcgene_idx = i
+                elif v == "Gene.refGene":
+                    gene_idx = i
             break
 
+    position_db_dict = {}
+    position_db_dict_filtered = {}
+    hout = open(result_file, 'w')
+    hout_filt = open(result_file3, 'w')
     with open(input_file, 'r') as hin:
         hin.readline()
         for line in hin:
@@ -227,51 +253,106 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
             ref = itemlist[3]
             alt = itemlist[4]
             
-            if (fishpval > 0.0 and float(itemlist[fisher_idx]) < fishpval): continue
-            if (ebpval > 0.0 and float(itemlist[ebcall_idx]) < ebpval): continue
-            if (realignpval > 0.0 and float(itemlist[realign_idx]) < realignpval): continue 
-            if (tcount > -1 and float(itemlist[tcount_idx]) < tcount): continue
-            if (ncount > -1 and float(itemlist[ncount_idx]) > ncount): continue
-    
             result = "\t\t\t"
             # insertion and deletion
-            if ref != '-' or alt != '-':
+            if ref == '-' or alt == '-':
                 start = start - 10 
                 end = end + 10
 
-            # SNV
+            record_key = ""
             try:
                 records = tb.fetch(chr, start, end)
                 for record_line in records:
                     record = record_line.split('\t')
                     ref_db = record[3]
                     alt_db = record[4]
+                    type_db = record[17]
     
-                    if ref == '-':
+                    # ins
+                    if ref == '-' and type_db == "INS":
                         score1 = exact_alignment(alt, alt_db)
                         score2 = exact_alignment(alt_db, alt)
-                        # print "score:" +str(score1) + "/ "+ str(len(alt))
-                        # print "score:" +str(score2) + "/ "+ str(len(alt_db))
-                        # print float(score1) / float(len(alt))
-                        # print float(score2) / float(len(alt_db))
                         if (float(score1) / float(len(alt))) >= 0.8 and (float(score2) / float(len(alt_db))) >= 0.8: 
+                            record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
                             result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
-                    elif alt == '-':
+                    # del
+                    elif alt == '-' and type_db == "DEL":
                         score1 = exact_alignment(ref, ref_db)
                         score2 = exact_alignment(ref_db, ref)
                         if (float(score1) / float(len(ref))) >= 0.8 and (float(score2) / float(len(ref_db))) >= 0.8: 
+                            record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
                             result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
+
+                    # SNV
                     elif ref == ref_db and alt == alt_db:
+                        record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
                         result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
     
             except ValueError:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                logging.error( ("{0}:{1}:{2} {3}:{4}-{5}".format( exc_type, fname, exc_tb.tb_lineno, chr, start ,end) ) )
-                print >> hout, line + result
-                continue
+                # logging.error( ("{0}:{1}:{2} {3}:{4}-{5}".format( exc_type, fname, exc_tb.tb_lineno, chr, start ,end) ) )
+  
+            if (func_ref != "" and itemlist[funcgene_idx] not in func_ref.split(',')) or \
+               (gene_ref != "" and itemlist[gene_idx] not in gene_ref.split(',')) or \
+               (fishpval > 0.0 and float(itemlist[fisher_idx]) < fishpval) or \
+               (ebpval > 0.0 and float(itemlist[ebcall_idx]) < ebpval) or \
+               (itemlist[realign_idx] != "---" and realignpval > 0.0 and float(itemlist[realign_idx]) < realignpval) or \
+               (itemlist[tcount_idx] != "---" and tcount > -1 and int(itemlist[tcount_idx]) < tcount) or \
+               (itemlist[ncount_idx] != "---" and ncount > -1 and int(itemlist[ncount_idx]) > ncount): \
+               
+                 # if record_key != "":
+                 position_db_dict_filtered[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
+                 print >> hout_filt, line + result
+            else:
+                 # if record_key != "":
+                 position_db_dict[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
+                 print >> hout, line + result
     
-            print >> hout, line + result
     hout.close()
+    hout_filt.close()
+
+    pre_key = ""
+    hout = open(result_file2, 'w')
+    with open(db_file, 'r') as hin:
+        for line in hin:
+            line = line.rstrip('\n')
+            F = line.split('\t')
+            key = F[0] +"\t"+ F[1] + "\t" + F[2]
+
+            if key == pre_key: continue
+
+            newline = "\t".join(F[8:])
+            if len(F) == 63:
+                newline = newline +"\t\t\t"
+
+            if position_db_dict.has_key(key):
+                print >> hout, newline +"\t"+ position_db_dict[key]
+            else:
+                print >> hout, newline
+
+            pre_key = key
+
+    pre_key = ""
+    hout = open(result_file4, 'w')
+    with open(db_file, 'r') as hin:
+        for line in hin:
+            line = line.rstrip('\n')
+            F = line.split('\t')
+            key = F[0] +"\t"+ F[1] + "\t" + F[2]
+
+            if key == pre_key: continue
+
+            newline = "\t".join(F[8:])
+            if len(F) == 63:
+                newline = newline +"\t\t\t"
+
+            if position_db_dict_filtered.has_key(key):
+                print >> hout, newline +"\t"+ position_db_dict_filtered[key]
+
+            pre_key = key
+
+
+
 
 

@@ -13,5 +13,5 @@ import mutation_util
 #
 def run_compare(arg):
 
-    mutation_util.compare_list(arg.input, arg.output, arg.database, arg.mapchain, arg.ebpval, arg.fishpval, arg.realignpval, arg.tcount, arg.ncount)
+    mutation_util.compare_list(arg.input, arg.output, arg.database, arg.mapchain, arg.ebpval, arg.fishpval, arg.realignpval, arg.tcount, arg.ncount, arg.func_ref, arg.gene_ref)
 
