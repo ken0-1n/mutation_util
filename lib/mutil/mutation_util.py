@@ -293,21 +293,22 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
                 # logging.error( ("{0}:{1}:{2} {3}:{4}-{5}".format( exc_type, fname, exc_tb.tb_lineno, chr, start ,end) ) )
   
-            if (func_ref != "" and itemlist[funcgene_idx] not in func_ref.split(',')) or \
-               (gene_ref != "" and itemlist[gene_idx] not in gene_ref.split(',')) or \
-               (fishpval > 0.0 and float(itemlist[fisher_idx]) < fishpval) or \
-               (ebpval > 0.0 and float(itemlist[ebcall_idx]) < ebpval) or \
-               (itemlist[realign_idx] != "---" and realignpval > 0.0 and float(itemlist[realign_idx]) < realignpval) or \
-               (itemlist[tcount_idx] != "---" and tcount > -1 and int(itemlist[tcount_idx]) < tcount) or \
-               (itemlist[ncount_idx] != "---" and ncount > -1 and int(itemlist[ncount_idx]) > ncount): \
-               
-                 # if record_key != "":
-                 position_db_dict_filtered[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
-                 print >> hout_filt, line + result
-            else:
-                 # if record_key != "":
-                 position_db_dict[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
-                 print >> hout, line + result
+            if (gene_ref == "" or itemlist[gene_idx] in gene_ref.split(',')):
+
+                if (func_ref != "" and itemlist[funcgene_idx] not in func_ref.split(',')) or \
+                   (fishpval > 0.0 and float(itemlist[fisher_idx]) < fishpval) or \
+                   (ebpval > 0.0 and float(itemlist[ebcall_idx]) < ebpval) or \
+                   (itemlist[realign_idx] != "---" and realignpval > 0.0 and float(itemlist[realign_idx]) < realignpval) or \
+                   (itemlist[tcount_idx] != "---" and tcount > -1 and int(itemlist[tcount_idx]) < tcount) or \
+                   (itemlist[ncount_idx] != "---" and ncount > -1 and int(itemlist[ncount_idx]) > ncount): \
+                   
+                     # if record_key != "":
+                     position_db_dict_filtered[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
+                     print >> hout_filt, line + result
+                else:
+                     # if record_key != "":
+                     position_db_dict[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
+                     print >> hout, line + result
     
     hout.close()
     hout_filt.close()
@@ -322,16 +323,18 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
 
             if key == pre_key: continue
 
-            newline = "\t".join(F[8:])
-            if len(F) == 63:
-                newline = newline +"\t\t\t"
+            if (gene_ref == "" or F[8] in gene_ref.split(',')):
 
-            if position_db_dict.has_key(key):
-                print >> hout, newline +"\t"+ position_db_dict[key]
-            else:
-                print >> hout, newline
+                newline = "\t".join(F[8:])
+                if len(F) == 63:
+                    newline = newline +"\t\t\t"
 
-            pre_key = key
+                if position_db_dict.has_key(key):
+                    print >> hout, newline +"\t"+ position_db_dict[key]
+                else:
+                    print >> hout, newline
+
+                pre_key = key
 
     pre_key = ""
     hout = open(result_file4, 'w')
@@ -343,16 +346,77 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
 
             if key == pre_key: continue
 
-            newline = "\t".join(F[8:])
-            if len(F) == 63:
-                newline = newline +"\t\t\t"
+            if (gene_ref == "" or F[8] in gene_ref.split(',')):
+            
+                newline = "\t".join(F[8:])
+                if len(F) == 63:
+                    newline = newline +"\t\t\t"
 
-            if position_db_dict_filtered.has_key(key):
-                print >> hout, newline +"\t"+ position_db_dict_filtered[key]
+                if position_db_dict_filtered.has_key(key):
+                    print >> hout, newline +"\t"+ position_db_dict_filtered[key]
 
-            pre_key = key
-
-
+                pre_key = key
 
 
+def get_header_idx(input_file):
+
+    # [0] P-value(fisher)
+    # [1] P-value(EBCall)
+    # [2] P-value(fisher_realignment)
+    # [3] variantPairNum_tumor
+    # [4] variantPairNum_normal
+    # [5] 10%_posterior_quantile
+    # [6] 10%_posterior_quantile(realignment)
+    # [7] variantPairNum
+    idx_list = [-1,-1,-1,-1,-1,-1,-1,-1]
+
+    with open(input_file, 'r') as hin:
+        for line in hin:
+            F = line.rstrip('\n').split('\t')
+            for i, v in enumerate(F):
+                if v == "P-value(fisher)":
+                    idx_list[0] = i
+                elif v == "P-value(EBCall)":
+                    idx_list[1] = i
+                elif v == "P-value(fisher_realignment)":
+                    idx_list[2] = i
+                elif v == "variantPairNum_tumor" :
+                    idx_list[3] = i
+                elif v == "variantPairNum_normal":
+                    idx_list[4] = i
+                elif v == "10%_posterior_quantile":
+                    idx_list[5] = i
+                elif v == "10%_posterior_quantile(realignment)":
+                    idx_list[6] = i
+                elif v == "variantPairNum":
+                    idx_list[7] = i
+            break
+    return idx_list
+
+
+def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, count):
+
+    idx_list = get_header_idx(input_file)
+
+    hout = open(output_file, 'w')
+    with open(input_file, 'r') as hin:
+        line = hin.readline()
+        line = line.rstrip('\n')
+        print >> hout, line
+
+        for line in hin:
+            line = line.rstrip('\n')
+            F = line.split('\t')
+
+            if ((idx_list[0] == -1 or float(F[idx_list[0]]) >= float(fishpval)) and \
+                (idx_list[1] == -1 or float(F[idx_list[1]]) >= float(ebpval))   and \
+                (idx_list[2] == -1 or F[idx_list[2]] == "---" or float(F[idx_list[2]]) >= float(realignpval)) and \
+                (idx_list[3] == -1 or F[idx_list[3]] == "---" or int(F[idx_list[3]]) >= int(tcount)) and \
+                (idx_list[4] == -1 or F[idx_list[4]] == "---" or int(F[idx_list[4]]) <= int(ncount)) and \
+                (idx_list[5] == -1 or float(F[idx_list[5]]) >= float(post10q)) and \
+                (idx_list[6] == -1 or F[idx_list[6]] == "---" or float(F[idx_list[6]]) >= float(r_post10q))) and \
+                (idx_list[7] == -1 or F[idx_list[7]] == "---" or int(F[idx_list[7]]) >= int(count)):
+                    
+                print >> hout, line
+    hout.close()
 
