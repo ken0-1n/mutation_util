@@ -1,5 +1,6 @@
 import sys, os, subprocess, gzip
-import pysam, logging, shutil
+import pysam
+from genomon_header_info import Genomon_header_info
 
 
 ###############################################
@@ -186,10 +187,7 @@ def exact_alignment(seq1, seq2):
 
 
 ###############################################
-def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval, realignpval, tcount, ncount, func_ref, gene_ref):
-
-    # if not os.path.exists(input_file):
-    #     raise ValueError("file not exists: " + input_file)
+def compare_list(in_genomon_mutation, output_dir, data_file, map_chain, ebpval, fishpval, realignpval, tcount, ncount, func_ref, gene_ref, post10q, r_post10q, v_count):
 
     if not os.path.isdir(output_dir): os.mkdir(output_dir)
     
@@ -202,119 +200,117 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
     tb = pysam.TabixFile(output_prefix +".bed.gz")
     db_file = output_prefix +".tmp.bed"
     
-    base, ext = os.path.splitext( os.path.basename(input_file) )
-    result_file = output_dir +"/"+ base +"_firehose.txt"
-    result_file3 = output_dir +"/"+ base +"_firehose_filtered.txt"
-    result_file2 = output_prefix +"firehose_only.maf.txt"
-    result_file4 = output_prefix +"firehose_only.maf_filtered.txt"
+    base, ext = os.path.splitext( os.path.basename(in_genomon_mutation) )
+    result_genomon = output_dir +"/"+ base +"_firehose.txt"
+    result_firehose = output_prefix +"firehose_only.maf.txt"
  
-    fisher_idx = -1
-    ebcall_idx = -1
-    realign_idx = -1
-    tcount_idx = -1
-    ncount_idx = -1
-    funcgene_idx = -1
-    gene_idx = -1
-    # check header line and NCBI_build
-    with open(input_file, 'r') as hin:
+    position_db_dict = {}
+    hout = open(result_genomon, 'w')
+
+    additional_header = "Tumor_Sample_Barcode"
+    ghi = Genomon_header_info()
+    # output meta and header line
+    with open(in_genomon_mutation, 'r') as hin:
         for line in hin:
-            F = line.rstrip('\n').split('\t')
-            for i, v in enumerate(F):
-                if v == "P-value(fisher)":
-                    fisher_idx = i
-                elif v == "P-value(EBCall)":
-                    ebcall_idx = i
-                elif v == "P-value(fhsher_realignment)":
-                    realign_idx = i
-                elif v == "variantPairNum_tumor":
-                    tcount_idx = i
-                elif v == "variantPairNum_normal":
-                    ncount_idx = i
-                elif v == "Func.refGene":
-                    funcgene_idx = i
-                elif v == "Gene.refGene":
-                    gene_idx = i
+            # print meta data
+            if line.startswith("#"):
+                print >> hout, line.rstrip('\n') + "\t" + additional_header
+                continue
+            # get header line
+            header = line
+            ghi.set_header_information(header)
+            print >> hout, header.rstrip('\n') + "\t" + additional_header
             break
 
-    position_db_dict = {}
-    position_db_dict_filtered = {}
-    hout = open(result_file, 'w')
-    hout_filt = open(result_file3, 'w')
-    with open(input_file, 'r') as hin:
-        hin.readline()
+    is_header = True
+    with open(in_genomon_mutation, 'r') as hin:
         for line in hin:
+            # skip meta data
+            if line.startswith("#"):
+                continue
+            # skip header line
+            if is_header:
+                is_header = False
+                continue
     
-            line = line.rstrip()
-            itemlist = line.split('\t')
+            line = line.rstrip('\n')
+            F = line.split('\t')
             
-            chr = itemlist[0]
-            start = (int(itemlist[1]) - 1)
-            end = int(itemlist[2])
-            ref = itemlist[3]
-            alt = itemlist[4]
-            
-            result = "\t\t\t"
-            # insertion and deletion
-            if ref == '-' or alt == '-':
-                start = start - 10 
-                end = end + 10
-
+            result = ""
             record_key = ""
             try:
-                records = tb.fetch(chr, start, end)
+                records = ""
+                if F[ghi.ref_idx] == '-' or F[ghi.alt_idx] == '-':
+                    records = tb.fetch(F[ghi.chr_idx], (int(F[ghi.start_idx]) - 11), (int(F[ghi.end_idx]) + 10))
+                else:
+                    records = tb.fetch(F[ghi.chr_idx], (int(F[ghi.start_idx]) - 1), int(F[ghi.end_idx]))
+
                 for record_line in records:
                     record = record_line.split('\t')
-                    ref_db = record[3]
-                    alt_db = record[4]
-                    type_db = record[17]
+                    tmp_record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
+                    tmp_result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
+                    ref_tb = record[3]
+                    alt_tb = record[4]
+                    type_tb = record[17]
     
                     # ins
-                    if ref == '-' and type_db == "INS":
-                        score1 = exact_alignment(alt, alt_db)
-                        score2 = exact_alignment(alt_db, alt)
-                        if (float(score1) / float(len(alt))) >= 0.8 and (float(score2) / float(len(alt_db))) >= 0.8: 
-                            record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
-                            result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
+                    if F[ghi.ref_idx] == '-' and type_tb == "INS":
+                        score1 = exact_alignment(F[ghi.alt_idx], alt_tb)
+                        score2 = exact_alignment(alt_tb, F[ghi.alt_idx])
+                        if (float(score1) / float(len(F[ghi.alt_idx]))) >= 0.8 and (float(score2) / float(len(alt_tb))) >= 0.8: 
+                            record_key = tmp_record_key
+                            result = tmp_result
+
                     # del
-                    elif alt == '-' and type_db == "DEL":
-                        score1 = exact_alignment(ref, ref_db)
-                        score2 = exact_alignment(ref_db, ref)
-                        if (float(score1) / float(len(ref))) >= 0.8 and (float(score2) / float(len(ref_db))) >= 0.8: 
-                            record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
-                            result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
+                    elif F[ghi.alt_idx] == '-' and type_tb == "DEL":
+                        score1 = exact_alignment(F[ghi.ref_idx], ref_tb)
+                        score2 = exact_alignment(ref_tb, F[ghi.ref_idx])
+                        if (float(score1) / float(len(F[ghi.ref_idx]))) >= 0.8 and (float(score2) / float(len(ref_tb))) >= 0.8: 
+                            record_key = tmp_record_key
+                            result = tmp_result
 
                     # SNV
-                    elif ref == ref_db and alt == alt_db:
-                        record_key = record[0] +"\t"+ record[1] + "\t" + record[2]
-                        result = "\t"+ record[5] +"\t"+ record[6] +"\t"+ record[7]
+                    elif F[ghi.ref_idx] == ref_tb and F[ghi.alt_idx] == alt_tb:
+                        record_key = tmp_record_key
+                        result = tmp_result
     
             except ValueError:
                 exc_type, exc_obj, exc_tb = sys.exc_info()
                 fname = os.path.split(exc_tb.tb_frame.f_code.co_filename)[1]
-                # logging.error( ("{0}:{1}:{2} {3}:{4}-{5}".format( exc_type, fname, exc_tb.tb_lineno, chr, start ,end) ) )
   
-            if (func_ref != "" and itemlist[funcgene_idx] not in func_ref.split(',')) or \
-               (gene_ref != "" and itemlist[gene_idx] not in gene_ref.split(',')) or \
-               (fishpval > 0.0 and float(itemlist[fisher_idx]) < fishpval) or \
-               (ebpval > 0.0 and float(itemlist[ebcall_idx]) < ebpval) or \
-               (itemlist[realign_idx] != "---" and realignpval > 0.0 and float(itemlist[realign_idx]) < realignpval) or \
-               (itemlist[tcount_idx] != "---" and tcount > -1 and int(itemlist[tcount_idx]) < tcount) or \
-               (itemlist[ncount_idx] != "---" and ncount > -1 and int(itemlist[ncount_idx]) > ncount): \
-               
+            if (( gene_ref == "" or F[ghi.gene_idx] in gene_ref.split(',')) and \
+                ( func_ref == "" or F[ghi.func_idx] in func_ref.split(',')) and \
+                ( ghi.fisher_idx == -1 or float(F[ghi.fisher_idx]) >= float(fishpval)) and \
+                ( ghi.ebcall_idx == -1 or float(F[ghi.ebcall_idx]) >= float(ebpval))   and \
+                ( ghi.realign_idx == -1 or F[ghi.realign_idx] == "---" or float(F[ghi.realign_idx]) >= float(realignpval)) and \
+                ( ghi.tcount_idx == -1 or F[ghi.tcount_idx] == "---" or int(F[ghi.tcount_idx]) >= int(tcount)) and \
+                ( ghi.ncount_idx == -1 or F[ghi.ncount_idx] == "---" or int(F[ghi.ncount_idx]) <= int(ncount)) and \
+                ( ghi.post10q_idx == -1 or float(F[ghi.post10q_idx]) >= float(post10q)) and \
+                ( ghi.r_post10q_idx == -1 or F[ghi.r_post10q_idx] == "---" or float(F[ghi.r_post10q_idx]) >= float(r_post10q)) and \
+                ( ghi.v_count_idx == -1 or F[ghi.v_count_idx] == "---" or int(F[ghi.v_count_idx]) >= int(v_count))):
+
                  # if record_key != "":
-                 position_db_dict_filtered[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
-                 print >> hout_filt, line + result
+                 position_db_dict[record_key] = "Exists\t"+ F[ghi.fisher_idx] +"\t"+ F[ghi.ebcall_idx] +"\t"+ F[ghi.realign_idx] +"\t"+ F[ghi.tcount_idx] +"\t"+ F[ghi.ncount_idx]
+                 if result == "": result = "\t\t\t"
+                 print >> hout, line + result
+
             else:
                  # if record_key != "":
-                 position_db_dict[record_key] = itemlist[fisher_idx] +"\t"+ itemlist[ebcall_idx] +"\t"+ itemlist[realign_idx] +"\t"+ itemlist[tcount_idx] +"\t"+ itemlist[ncount_idx]
-                 print >> hout, line + result
+                 position_db_dict[record_key] = "Filtered\t"+ F[ghi.fisher_idx] +"\t"+ F[ghi.ebcall_idx] +"\t"+ F[ghi.realign_idx] +"\t"+ F[ghi.tcount_idx] +"\t"+ F[ghi.ncount_idx]
     
     hout.close()
-    hout_filt.close()
+
+    hout = open(result_firehose, 'w')
+
+    additional_header = "merge_status\tP-value(fisher)\tP-value(EBCall)\tP-value(fhsher_realignment)\tvariantPairNum_tumor\tvariantPairNum_normal"
+    with open(data_file, 'r') as hin:
+        header = hin.readline()
+        header = header.rstrip()
+        print >> hout, header + "\t" + additional_header
 
     pre_key = ""
-    hout = open(result_file2, 'w')
     with open(db_file, 'r') as hin:
+
         for line in hin:
             line = line.rstrip('\n')
             F = line.split('\t')
@@ -322,37 +318,60 @@ def compare_list(input_file, output_dir, data_file, map_chain, ebpval, fishpval,
 
             if key == pre_key: continue
 
-            newline = "\t".join(F[8:])
-            if len(F) == 63:
-                newline = newline +"\t\t\t"
+            gene_name = F[8]
+            if (gene_ref == "" or gene_name in gene_ref.split(',')):
 
-            if position_db_dict.has_key(key):
-                print >> hout, newline +"\t"+ position_db_dict[key]
-            else:
-                print >> hout, newline
+                if key in position_db_dict:
+                    print >> hout, "\t".join(F[8:]) +"\t"+ position_db_dict[key]
+                else:
+                    print >> hout, "\t".join(F[8:])
 
-            pre_key = key
+                pre_key = key
 
-    pre_key = ""
-    hout = open(result_file4, 'w')
-    with open(db_file, 'r') as hin:
+    hout.close()
+
+
+###############################################
+def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count):
+
+    # genomon header idx infomation object
+    ghi = Genomon_header_info()
+    hout = open(output_file, 'w')
+    with open(input_file, 'r') as hin:
         for line in hin:
+            # print meta data
+            if line.startswith("#"):
+                print >> hout, line.rstrip('\n')
+                continue
+            # get header line
+            header = line
+            ghi.set_header_information(header)
+            print >> hout, header.rstrip('\n')
+            break
+   
+    is_header = True
+    with open(input_file, 'r') as hin:
+        for line in hin:
+            # skip meta data
+            if line.startswith("#"):
+                continue
+            # skip header line
+            if is_header:
+                is_header = False
+                continue
+
             line = line.rstrip('\n')
             F = line.split('\t')
-            key = F[0] +"\t"+ F[1] + "\t" + F[2]
 
-            if key == pre_key: continue
-
-            newline = "\t".join(F[8:])
-            if len(F) == 63:
-                newline = newline +"\t\t\t"
-
-            if position_db_dict_filtered.has_key(key):
-                print >> hout, newline +"\t"+ position_db_dict_filtered[key]
-
-            pre_key = key
-
-
-
-
+            if (( ghi.fisher_idx == -1 or float(F[ghi.fisher_idx]) >= float(fishpval)) and \
+                ( ghi.ebcall_idx == -1 or float(F[ghi.ebcall_idx]) >= float(ebpval))   and \
+                ( ghi.realign_idx == -1 or F[ghi.realign_idx] == "---" or float(F[ghi.realign_idx]) >= float(realignpval)) and \
+                ( ghi.tcount_idx == -1 or F[ghi.tcount_idx] == "---" or int(F[ghi.tcount_idx]) >= int(tcount)) and \
+                ( ghi.ncount_idx == -1 or F[ghi.ncount_idx] == "---" or int(F[ghi.ncount_idx]) <= int(ncount)) and \
+                ( ghi.post10q_idx == -1 or float(F[ghi.post10q_idx]) >= float(post10q)) and \
+                ( ghi.r_post10q_idx == -1 or F[ghi.r_post10q_idx] == "---" or float(F[ghi.r_post10q_idx]) >= float(r_post10q)) and \
+                ( ghi.v_count_idx == -1 or F[ghi.v_count_idx] == "---" or int(F[ghi.v_count_idx]) >= int(v_count))):
+                    
+                print >> hout, line
+    hout.close()
 

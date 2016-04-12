@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='mutation-util',
-    version='0.1.0',
+    version='0.2.1',
     description='Python tools to identify somatic mutations.',
     author='Ken-ichi Chiba',
     author_email='kchiba@hgc.jp',
