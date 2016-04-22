@@ -5,53 +5,56 @@ class Genomon_header_info:
 
     def __init__(self):
     
-        self.fisher_idx = -1
-        self.ebcall_idx = -1
-        self.realign_idx = -1
-        self.tcount_idx = -1
-        self.ncount_idx = -1
-        self.post10q_idx = -1
-        self.r_post10q_idx = -1
-        self.v_count_idx = -1
-        self.chr_idx = -1
-        self.start_idx = -1
-        self.end_idx = -1
-        self.ref_idx = -1
-        self.alt_idx = -1
-        self.func_idx = -1
-        self.gene_idx = -1
+        self.fisher = -1
+        self.ebcall = -1
+        self.realign = -1
+        self.tcount = -1
+        self.ncount = -1
+        self.post10q = -1
+        self.r_post10q = -1
+        self.v_count = -1
+        self.chr = -1
+        self.start = -1
+        self.end = -1
+        self.ref = -1
+        self.alt = -1
+        self.func = -1
+        self.gene = -1
+        self.tumor_barcode = -1
    
     def set_header_information(self,header):
         F = header.rstrip('\n').split('\t')
         for i, v in enumerate(F):
             if v == "P-value(fisher)":
-                self.fisher_idx = i
+                self.fisher = i
             elif v == "P-value(EBCall)":
-                self.ebcall_idx = i
+                self.ebcall = i
             elif v == "P-value(fisher_realignment)":
-                self.realign_idx = i
+                self.realign = i
             elif v == "variantPairNum_tumor" :
-                self.tcount_idx = i
+                self.tcount = i
             elif v == "variantPairNum_normal":
-                self.ncount_idx = i
+                self.ncount = i
             elif v == "10%_posterior_quantile":
-                self.post10q_idx = i
+                self.post10q = i
             elif v == "10%_posterior_quantile(realignment)":
-                self.r_post10q_idx = i
+                self.r_post10q = i
             elif v == "variantPairNum":
-                self.v_count_idx = i
+                self.v_count = i
             elif v == "Chr":
-                self.chr_idx = i
+                self.chr = i
             elif v == "Start":
-                self.start_idx = i
+                self.start = i
             elif v == "End":
-                self.end_idx = i
+                self.end = i
             elif v == "Ref":
-                self.ref_idx = i
+                self.ref = i
             elif v == "Alt":
-                self.alt_idx = i
+                self.alt = i
             elif v == "Func.refGene":
-                self.func_idx = i
+                self.func = i
             elif v == "Gene.refGene":
-                self.gene_idx = i
+                self.gene = i
+            elif v == "Tumor_Sample_Barcode":
+                self.tumor_barcode = i
     

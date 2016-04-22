@@ -17,16 +17,18 @@ parse_parser.add_argument( '-i', '--input', help = 'mutation list', type = str, 
 parse_parser.add_argument( '-d', '--database', help = 'fairhose maf', type = str, default = None, required = True )
 parse_parser.add_argument( '-o', '--output', help = 'output directory', type = str, default = None, required = True)
 parse_parser.add_argument( '-m', '--mapchain', help = 'map chain file', type = str, default = None)
-parse_parser.add_argument( '-e', '--eb_pval', help = 'EBCall P-value', type = float, default = 0.0)
-parse_parser.add_argument( '-f', '--fish_pval', help = 'Fisher test P-value', type = float, default = 0.0)
-parse_parser.add_argument( '-r', '--realign_pval', help = 'Realignment Fisher test P-value', type = float, default = 0.0)
-parse_parser.add_argument( '-t', '--tcount', help = 'read count of tumor', type = int, default = -1)
-parse_parser.add_argument( '-n', '--ncount', help = 'read count of normal', type = int, default = -1)
-parse_parser.add_argument( '-p', '--post10q', help = '10% posterior quantile', type = float, default = 0.0)
-parse_parser.add_argument( '-q', '--r_post10q', help = 'Realignment 10% posterior quantile', type = float, default = 0.0)
-parse_parser.add_argument( '-c', '--count', help = 'read count', type = int, default = -1)
-parse_parser.add_argument( '-g', '--func_ref', help = 'select [downstream,exonic,intergenic,intronic,ncRNA_exonic,ncRNA_intronic,splicing,upstream,upstream;downstream,UTR3,UTR5]', type = str, default = "downstream,exonic,intergenic,intronic,ncRNA_exonic,ncRNA_intronic,splicing,upstream,upstream;downstream,UTR3,UTR5")
-parse_parser.add_argument( '-1', '--gene_ref', help = 'select gene name', type = str, default = "")
+parse_parser.add_argument( '-e', '--eb_pval', help = 'EBCall P-value', type = float, default = 4.0)
+parse_parser.add_argument( '-f', '--fish_pval', help = 'Fisher test P-value', type = float, default = 1.0)
+parse_parser.add_argument( '-r', '--realign_pval', help = 'Realignment Fisher test P-value', type = float, default = 1.0)
+parse_parser.add_argument( '-t', '--tcount', help = 'read count of tumor', type = int, default = 4)
+parse_parser.add_argument( '-n', '--ncount', help = 'read count of normal', type = int, default = 2)
+parse_parser.add_argument( '-p', '--post10q', help = '10% posterior quantile', type = float, default = 1.0)
+parse_parser.add_argument( '-q', '--r_post10q', help = 'Realignment 10% posterior quantile', type = float, default = 1.0)
+parse_parser.add_argument( '-c', '--count', help = 'read count', type = int, default = 4)
+parse_parser.add_argument( '-g', '--gene_ref', help = 'target', type = str, default = "")
+parse_parser.add_argument( '-1', '--print_graph', help = 'print graph', type = bool, default = True)
+parse_parser.add_argument( '-2', '--pancan', help = 'use pancan', type = str, default = "")
+parse_parser.add_argument( '-3', '--hotspot', help = 'use hotspot', type = str, default = "")
 
 parse_parser.set_defaults(func = run_compare)
 
@@ -45,6 +47,37 @@ parse_parser.add_argument( '-q', '--r_post10q', help = 'Realignment 10% posterio
 parse_parser.add_argument( '-c', '--count', help = 'read count', type = int, default = -1)
 
 parse_parser.set_defaults(func = run_filter)
+
+####################
+# compare 
+parse_parser = subparsers.add_parser("all")
+parse_parser.add_argument( '-i', '--input', help = 'mutation list', type = str, default = None, required = True )
+parse_parser.add_argument( '-d', '--database', help = 'fairhose maf', type = str, default = None, required = True )
+parse_parser.add_argument( '-o', '--output', help = 'output directory', type = str, default = None, required = True)
+parse_parser.add_argument( '-m', '--mapchain', help = 'map chain file', type = str, default = None)
+parse_parser.add_argument( '-e', '--eb_pval', help = 'EBCall P-value', type = float, default = 4.0)
+parse_parser.add_argument( '-f', '--fish_pval', help = 'Fisher test P-value', type = float, default = 1.0)
+parse_parser.add_argument( '-r', '--realign_pval', help = 'Realignment Fisher test P-value', type = float, default = 1.0)
+parse_parser.add_argument( '-t', '--tcount', help = 'read count of tumor', type = int, default = 4)
+parse_parser.add_argument( '-n', '--ncount', help = 'read count of normal', type = int, default = 2)
+parse_parser.add_argument( '-p', '--post10q', help = '10% posterior quantile', type = float, default = 1.0)
+parse_parser.add_argument( '-q', '--r_post10q', help = 'Realignment 10% posterior quantile', type = float, default = 1.0)
+parse_parser.add_argument( '-c', '--count', help = 'read count', type = int, default = 4)
+parse_parser.add_argument( '-g', '--gene_ref', help = 'select gene name', type = str, default = "")
+parse_parser.add_argument( '-2', '--pancan', help = 'use pancan', type = str, default = "")
+parse_parser.add_argument( '-3', '--hotspot', help = 'use hotspot', type = str, default = "")
+
+parse_parser.set_defaults(func = run_all)
+
+####################
+# coount
+parse_parser = subparsers.add_parser("count")
+parse_parser.add_argument( '-i', '--inbam', help = 'bam file', type = str, default = None, required = True )
+parse_parser.add_argument( '-f', '--ref_fa', help = 'Reference genome in fasta format', type = str, default = None , required = True)
+parse_parser.add_argument( '-s', '--samtools_path', type = str, default = None, required = True)
+parse_parser.add_argument( '-r', '--region', help = 'region in which pileup is generated', type = str, default = None, required = True )
+
+parse_parser.set_defaults(func = run_count)
 
 args = parser.parse_args()
 args.func(args)
