@@ -21,6 +21,10 @@ class Genomon_header_info:
         self.func = -1
         self.gene = -1
         self.tumor_barcode = -1
+        self.tdepth = -1
+        self.tvariant = -1
+        self.ndepth = -1
+        self.nvariant = -1
    
     def set_header_information(self,header):
         F = header.rstrip('\n').split('\t')
@@ -57,4 +61,12 @@ class Genomon_header_info:
                 self.gene = i
             elif v == "Tumor_Sample_Barcode":
                 self.tumor_barcode = i
+            elif v == "depth_tumor":
+                self.tdepth = i
+            elif v == "variantNum_tumor":
+                self.tvariant = i
+            elif v == "depth_normal":
+                self.ndepth = i
+            elif v == "variantNum_normal":
+                self.nvariant = i
     

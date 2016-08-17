@@ -7,6 +7,9 @@ import argparse
 import logging
 import mutation_util
 import count_bases
+import hotspot_check
+import add_annotation
+import blacklist
 
 
 #
@@ -23,4 +26,13 @@ def run_all(arg):
 
 def run_count(arg):
     count_bases.pileup_and_count(arg.inbam, arg.ref_fa, arg.samtools_path, arg.region)
+
+def run_hotspot(arg):
+    hotspot_check.compare_hotspot_list(arg.in_hotspot_mutation, arg.in_genomon_mutation, arg.output, arg.noheader)
+
+def run_annotate(arg):
+    add_annotation.annotate(arg.in_mutation, arg.annovar_path, arg.noheader) 
+
+def run_blacklist(arg):
+    blacklist.filter(arg.in_mutation, arg.blacklist, arg.output, arg.min_candidate) 
 

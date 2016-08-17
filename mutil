@@ -79,6 +79,34 @@ parse_parser.add_argument( '-r', '--region', help = 'region in which pileup is g
 
 parse_parser.set_defaults(func = run_count)
 
+####################
+# coount
+parse_parser = subparsers.add_parser("hotspot")
+parse_parser.add_argument( '-i', '--in_hotspot_mutation', type = str, default = None, required = True )
+parse_parser.add_argument( '-g', '--in_genomon_mutation', type = str, default = None, required = True )
+parse_parser.add_argument( '-o', '--output', type = str, default = None, required = True)
+parse_parser.add_argument('--noheader', default = True, action = 'store_false')
+
+parse_parser.set_defaults(func = run_hotspot)
+
+####################
+# coount
+parse_parser = subparsers.add_parser("annotate")
+parse_parser.add_argument( '-i', '--in_mutation', type = str, default = None, required = True )
+parse_parser.add_argument( '-a', '--annovar_path', type = str, default = None, required = True )
+parse_parser.add_argument('--noheader', default = True, action = 'store_false')
+
+parse_parser.set_defaults(func = run_annotate)
+
+####################
+# blacklist
+parse_parser = subparsers.add_parser("blacklist")
+parse_parser.add_argument( '-i', '--in_mutation', type = str, default = None, required = True )
+parse_parser.add_argument( '-b', '--blacklist', type = str, default = None, required = True )
+parse_parser.add_argument( '-o', '--output', type = str, default = None, required = True)
+parse_parser.add_argument( '-m', '--min_candidate', help = 'min_candidate', type = int, default = 2)
+parse_parser.set_defaults(func = run_blacklist)
+
 args = parser.parse_args()
 args.func(args)
 

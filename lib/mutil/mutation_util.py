@@ -674,3 +674,4 @@ def compare_all(in_genomon_mutation_glob, output_dir, data_file_dir, map_chain, 
     if os.path.getsize(output_dir+'/print_R_INDEL_tmp.txt'):
         os.system('R --vanilla --slave  --args ' +output_dir+'/print_R_INDEL_tmp.txt ' +output_dir+'/'+base+'.indel.tiff '+base+' '+str(fishpval)+' '+str(ebpval)+' '+str(realignpval)+' '+str(tcount)+' '+str(ncount)+' '+str(genomon_total)+' '+str(firehose_total)+' < script/venn_mutation.R')
 
+
