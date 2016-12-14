@@ -526,7 +526,7 @@ def compare_list(in_genomon_mutation, output_dir, data_file, map_chain, ebpval, 
             os.system('R --vanilla --slave  --args ' +output_dir+'/print_R_INDEL_tmp.txt ' +output_prefix+'.indel.tiff '+base+' '+str(fishpval)+' '+str(ebpval)+' '+str(realignpval)+' '+str(tcount)+' '+str(ncount)+' '+str(genomon_total)+' '+str(firehose_total)+' < script/venn_mutation.R')
 
 ###############################################
-def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count):
+def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, h_score):
 
     # genomon header idx infomation object
     ghi = Genomon_header_info()
@@ -565,8 +565,13 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
                 ( ghi.post10q == -1 or float(F[ghi.post10q]) >= float(post10q)) and \
                 ( ghi.r_post10q == -1 or (F[ghi.r_post10q] != "---" and float(F[ghi.r_post10q]) >= float(r_post10q))) and \
                 ( ghi.v_count == -1 or   (F[ghi.v_count] != "---" and int(F[ghi.v_count]) >= int(v_count)))):
-                    
+                
                 print >> hout, line
+
+            elif ( ghi.score_hotspot != -1 and float(ghi.score_hotspot) >= float(h_score)) :
+
+                print >> hout, line
+
     hout.close()
 
 ###############################################
