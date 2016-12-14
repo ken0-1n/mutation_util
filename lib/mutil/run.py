@@ -10,6 +10,7 @@ import count_bases
 import hotspot_check
 import add_annotation
 import blacklist
+import hotspot_merge
 
 
 #
@@ -35,4 +36,8 @@ def run_annotate(arg):
 
 def run_blacklist(arg):
     blacklist.filter(arg.in_mutation, arg.blacklist, arg.output, arg.min_candidate) 
+    
+def run_hotspot_merge(arg):
+    hotspot_merge.merge_hotspot_list(arg.in_hotspot_mutation, arg.in_fisher_mutation, arg.output_file, arg.hotspot_header, arg.fisher_header)
+
 
