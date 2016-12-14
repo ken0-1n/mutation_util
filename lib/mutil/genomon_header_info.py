@@ -25,6 +25,7 @@ class Genomon_header_info:
         self.tvariant = -1
         self.ndepth = -1
         self.nvariant = -1
+        self.score_hotspot = -1
    
     def set_header_information(self,header):
         F = header.rstrip('\n').split('\t')
@@ -69,4 +70,6 @@ class Genomon_header_info:
                 self.ndepth = i
             elif v == "variantNum_normal":
                 self.nvariant = i
+            elif v == "score(hotspot)":
+                self.score_hotspot = i
     
