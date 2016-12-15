@@ -526,7 +526,7 @@ def compare_list(in_genomon_mutation, output_dir, data_file, map_chain, ebpval, 
             os.system('R --vanilla --slave  --args ' +output_dir+'/print_R_INDEL_tmp.txt ' +output_prefix+'.indel.tiff '+base+' '+str(fishpval)+' '+str(ebpval)+' '+str(realignpval)+' '+str(tcount)+' '+str(ncount)+' '+str(genomon_total)+' '+str(firehose_total)+' < script/venn_mutation.R')
 
 ###############################################
-def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, h_score):
+def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count):
 
     # genomon header idx infomation object
     ghi = Genomon_header_info()
