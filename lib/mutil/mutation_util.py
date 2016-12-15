@@ -568,7 +568,7 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
                 
                 print >> hout, line
 
-            elif ( ghi.score_hotspot != -1 and ghi.score_hotspot != "---" and float(ghi.score_hotspot) >= float(h_score)) :
+            elif ( ghi.score_hotspot != -1 and (F[ghi.score_hotspot]) != "---") :
 
                 print >> hout, line
 
