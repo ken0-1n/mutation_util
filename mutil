@@ -45,6 +45,7 @@ parse_parser.add_argument( '-n', '--ncount', help = 'read count of normal', type
 parse_parser.add_argument( '-p', '--post10q', help = '10% posterior quantile', type = float, default = 0.0)
 parse_parser.add_argument( '-q', '--r_post10q', help = 'Realignment 10% posterior quantile', type = float, default = 0.0)
 parse_parser.add_argument( '-c', '--count', help = 'read count', type = int, default = -1)
+parse_parser.add_argument( '-d', '--hotspot_db', help = 'hotspot_database_file', type = str, default = "")
 
 parse_parser.set_defaults(func = run_filter)
 

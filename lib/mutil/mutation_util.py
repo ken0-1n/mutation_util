@@ -526,7 +526,7 @@ def compare_list(in_genomon_mutation, output_dir, data_file, map_chain, ebpval, 
             os.system('R --vanilla --slave  --args ' +output_dir+'/print_R_INDEL_tmp.txt ' +output_prefix+'.indel.tiff '+base+' '+str(fishpval)+' '+str(ebpval)+' '+str(realignpval)+' '+str(tcount)+' '+str(ncount)+' '+str(genomon_total)+' '+str(firehose_total)+' < script/venn_mutation.R')
 
 ###############################################
-def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count):
+def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, hotspot_database):
 
     # genomon header idx infomation object
     ghi = Genomon_header_info()
@@ -542,7 +542,21 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
             ghi.set_header_information(header)
             print >> hout, header.rstrip('\n')
             break
-   
+
+    hotspot_list = []
+    if os.path.exists(hotspot_database):
+        with open(hotspot_database, "r") as HI:
+            for line in HI:
+                line = line.rstrip('\n')
+                F = line.split("\t")
+                chr = F[0]
+                start = F[1]
+                end = F[2]
+                ref= F[3]
+                alt = F[4]
+                key = str(chr) +"\t"+ str(start) +"\t"+ str(end) +"\t"+ ref +"\t"+ alt
+                hotspot_list.append(key)
+
     is_header = True
     with open(input_file, 'r') as hin:
         for line in hin:
@@ -556,6 +570,7 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
 
             line = line.rstrip('\n')
             F = line.split('\t')
+            key = str(F[ghi.chr]) +"\t"+ str(F[ghi.start]) +"\t"+ str(F[ghi.end]) +"\t"+ F[ghi.ref].upper() +"\t"+ F[ghi.alt].upper()
 
             if (( ghi.fisher == -1 or float(F[ghi.fisher]) >= float(fishpval)) and \
                 ( ghi.ebcall == -1 or float(F[ghi.ebcall]) >= float(ebpval))   and \
@@ -569,6 +584,10 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
                 print >> hout, line
 
             elif ( ghi.score_hotspot != -1 and (F[ghi.score_hotspot]) != "---") :
+
+                print >> hout, line
+
+            elif key in hotspot_list:
 
                 print >> hout, line
 
