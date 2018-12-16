@@ -534,9 +534,10 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
     with open(input_file, 'r') as hin:
         for line in hin:
             # print meta data
-            if line.startswith("#"):
-                print >> hout, line.rstrip('\n')
-                continue
+            if not line.startswith("#chr"):
+                if line.startswith("#"):
+                    print >> hout, line.rstrip('\n')
+                    continue
             # get header line
             header = line
             ghi.set_header_information(header)

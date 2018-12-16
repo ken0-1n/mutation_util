@@ -46,15 +46,15 @@ class Genomon_header_info:
                 self.r_post10q = i
             elif v == "variantPairNum":
                 self.v_count = i
-            elif v == "Chr":
+            elif v == "Chr" or v == "#chr":
                 self.chr = i
-            elif v == "Start":
+            elif v == "Start" or v == "start":
                 self.start = i
-            elif v == "End":
+            elif v == "End" or v == "end":
                 self.end = i
-            elif v == "Ref":
+            elif v == "Ref" or v == "ref":
                 self.ref = i
-            elif v == "Alt":
+            elif v == "Alt" or v == "alt":
                 self.alt = i
             elif v == "Func.refGene":
                 self.func = i
