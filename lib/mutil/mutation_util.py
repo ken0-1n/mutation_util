@@ -562,8 +562,9 @@ def filt_mutation_result(input_file, output_file, ebpval, fishpval, realignpval,
     with open(input_file, 'r') as hin:
         for line in hin:
             # skip meta data
-            if line.startswith("#"):
-                continue
+            if not line.startswith("#chr"):
+                if line.startswith("#"):
+                    continue
             # skip header line
             if is_header:
                 is_header = False
