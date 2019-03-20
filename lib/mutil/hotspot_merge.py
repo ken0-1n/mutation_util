@@ -47,3 +47,42 @@ def merge_hotspot_list(in_hotspot_mutation, in_genomon_mutation, output_file, sk
 
     hout.close()
 
+def merge_hotspot_vcf(in_hotspot_mutation, in_genomon_mutation, output_file):
+
+    with open(output_file, 'w') as hout:
+        hotspot_hash = {}
+        with open(in_hotspot_mutation, 'r') as hin:
+            for line in hin:
+                line = line.rstrip('\n')
+                # print metadata & header line
+                if line.startswith("#"):
+                    print >> hout, line
+                    continue
+                F = line.split('\t')
+                chrom, pos, ids, ref, alt = F[0:5]
+                hotspot_hash[chrom+"\t"+pos+"\t"+ref+"\t"+alt] = line
+    
+        with open(in_genomon_mutation, 'r') as hin:
+            for line in hin:
+                line = line.rstrip('\n')
+                # skip header line
+                if line.startswith("#"): continue
+                F = line.split('\t')
+                chrom, pos, ids, ref, alt, qual, filters, infos = F[0:8]
+                key = chrom+"\t"+pos+"\t"+ref+"\t"+alt
+                if key in hotspot_hash: 
+                    hotspot_line =  hotspot_hash[key]
+                    hotspot_infos = hotspot_line.split("\t")[7]
+                    hotspot_infoF = hotspot_infos.split(";")
+                    hotspot_lod_socre = ""
+                    for hotspot_info_val in hotspot_infoF:
+                        if hotspot_info_val.startswith("LS="):
+                            hotspot_lod_socre=hotspot_info_val
+                    del hotspot_hash[key]
+                    print >> hout, "\t".join(F[0:7]) +"\t"+ infos+";"+hotspot_lod_socre +"\t"+ "\t".join(F[8:])
+                else:
+                    print >> hout, line
+
+        for v in hotspot_hash.values():
+            print >> hout, v
+

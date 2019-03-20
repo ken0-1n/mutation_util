@@ -7,7 +7,7 @@ import argparse
 # top level parser
 #
 parser = argparse.ArgumentParser(prog = "mutil")
-parser.add_argument("--version", action = "version", version = "MutationUtil-0.5.2")
+parser.add_argument("--version", action = "version", version = "MutationUtil-0.5.3")
 subparsers = parser.add_subparsers()
 
 ####################
@@ -46,7 +46,9 @@ parse_parser.add_argument( '-p', '--post10q', help = '10% posterior quantile', t
 parse_parser.add_argument( '-q', '--r_post10q', help = 'Realignment 10% posterior quantile', type = float, default = 0.0)
 parse_parser.add_argument( '-c', '--count', help = 'read count', type = int, default = -1)
 parse_parser.add_argument( '-d', '--hotspot_db', help = 'hotspot_database_file', type = str, default = "")
-
+parse_parser.add_argument( '-1', '--sample1', help = '1st sample name ( disease )', type = str, default = None)
+parse_parser.add_argument( '-2', '--sample2', help = '2nd sample name ( control )', type = str, default = None)
+parse_parser.add_argument( '-O', '--print_format', choices = ['vcf','anno'], help = 'Print VCF or anno(TSV) format',  default = 'anno' )
 parse_parser.set_defaults(func = run_filter)
 
 ####################
@@ -114,9 +116,9 @@ parse_parser = subparsers.add_parser("merge_hotspot")
 parse_parser.add_argument( '-i', '--in_hotspot_mutation', type = str, default = None, required = True )
 parse_parser.add_argument( '-f', '--in_fisher_mutation', type = str, default = None, required = True )
 parse_parser.add_argument( '-o', '--output_file', type = str, default = None, required = True)
+parse_parser.add_argument( '-P', '--print_format', choices = ['vcf','anno'], help = 'Print VCF or anno(TSV) format',  default = 'anno' )
 parse_parser.add_argument('--hotspot_header', default = False, action = 'store_true')
 parse_parser.add_argument('--fisher_header', default = False, action = 'store_true')
-
 parse_parser.set_defaults(func = run_hotspot_merge)
 
 args = parser.parse_args()
