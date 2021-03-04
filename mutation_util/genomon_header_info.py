@@ -1,6 +1,3 @@
-
-#! /usr/bin/env python
-
 class Genomon_header_info:
 
     def __init__(self):

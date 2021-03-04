@@ -1,15 +1,42 @@
-#!/usr/bin/env python
+from setuptools import setup, find_packages
+from os import path
+here = path.abspath(path.dirname(__file__))
 
-from distutils.core import setup
+def get_version():
+    with open(path.join(here, "mutation_util/version.py")) as hin:
+        for line in hin:
+            if line.startswith("__version__"):
+                version = line.partition('=')[2]
+                return version.strip().strip('\'"')
+    raise ValueError('Could not find version.')
 
-setup(name='mutation-util',
-    version='0.5.3',
-    description='Python tools to identify somatic mutations.',
-    author='Ken-ichi Chiba',
-    author_email='kchiba@hgc.jp',
-    url='https://github.com/Genomon-Project/GenomonFisher',
-    package_dir = {'': 'lib'},
-    packages=['mutil'],
-    scripts=['mutil'],
-    license='GPL-3'
+setup(
+      name='mutil',
+      version=get_version(),
+      description="Python programs for analyzing onebreak results.",
+      long_description="""""",
+
+      classifiers=[
+          #   3 - Alpha
+          #   4 - Beta
+          #   5 - Production/Stable
+          'Development Status :: 5 - Stable',
+          # Indicate who your project is intended for
+          'Intended Audience :: Science/Research',
+          'Topic :: Scientific/Engineering :: Bio-Informatics',
+      ],
+      
+      keywords='Bio-informatics',
+      author='Ken-ichi Chiba',
+      author_email='kchiba@hgc.jp',
+      url='https://github.com/ken0-1n/mutation_util.git',
+      license='GPL-3',
+      
+      packages = find_packages(exclude = ['tests']),
+      install_requires=[
+      ],
+      entry_points = {'console_scripts': ['mutil = mutation_util:main']},
+      test_suite = 'unit_tests.suite'
 )
+
+

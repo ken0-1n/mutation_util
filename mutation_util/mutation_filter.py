@@ -1,13 +1,11 @@
 import sys, os, subprocess, gzip
 import vcf
-from genomon_header_info import Genomon_header_info
 
 
 ###############################################
-def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, hotspot_database):
+def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, hotspot_database, ghi):
 
     # genomon header idx infomation object
-    ghi = Genomon_header_info()
     hout = open(output_file, 'w')
     with open(input_file, 'r') as hin:
         for line in hin:
@@ -19,7 +17,7 @@ def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval,
             # get header line
             header = line
             ghi.set_header_information(header)
-            print >> hout, header.rstrip('\n')
+            print(header.rstrip('\n'),file=hout)
             break
 
     hotspot_list = []
@@ -60,18 +58,18 @@ def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval,
                 ( ghi.post10q == -1 or float(F[ghi.post10q]) >= float(post10q)) and \
                 ( ghi.r_post10q == -1 or (F[ghi.r_post10q] != "---" and float(F[ghi.r_post10q]) >= float(r_post10q))) and \
                 ( ghi.v_count == -1 or   (F[ghi.v_count] != "---" and int(F[ghi.v_count]) >= int(v_count)))):
-                print >> hout, line
+                print(line, file=hout)
 
             elif ( ghi.score_hotspot != -1 and (F[ghi.score_hotspot]) != "---") :
-                print >> hout, line
+                print(line, file=hout)
 
             elif key in hotspot_list:
-                print >> hout, line
+                print(line, file=hout)
 
     hout.close()
 
 ###############################################
-def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, sample1, sample2):
+def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, sample1, sample2, ghi):
 
     vcf_reader = vcf.Reader(filename = input_file)
     vcf_writer = vcf.Writer(open(output_file, 'w'), vcf_reader)
