@@ -12,7 +12,7 @@ def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval,
             # print meta data
             if not line.startswith("#chr"):
                 if line.startswith("#"):
-                    print >> hout, line.rstrip('\n')
+                    print(line.rstrip('\n'), file=hout)
                     continue
             # get header line
             header = line
