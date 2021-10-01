@@ -9,6 +9,7 @@ import sys
 import argparse
 from .version import __version__
 from .run import run_filter
+from .run import run_merge_hotspot
 
 def create_parser():
     prog = "mutil"
@@ -35,6 +36,17 @@ def create_parser():
         filter_parser.add_argument( '-O', '--print_format', choices = ['vcf','anno'], help = 'Print VCF or anno(TSV) format',  default = 'anno' )
         return filter_parser
         
+    def _create_merge_hotspot_parser(subparsers):
+        
+        merge_hotspot_parser = subparsers.add_parser("merge_hotspot")
+        merge_hotspot_parser.add_argument( '-i', '--input_vcf', help = 'path of input vcf is bgziped', type = str, default = None, required = True )
+        merge_hotspot_parser.add_argument( '-d', '--hotspot_vcf', help = 'path of hotspot vcf is bgziped', type = str, default = None, required = True)
+        merge_hotspot_parser.add_argument( '-o', '--merged_vcf', help = 'path of output vcf. Do not use the gz extension', type = str, default = None, required = True)
+        merge_hotspot_parser.add_argument( '-O', '--print_format', choices = ['vcf'], help = 'Print VCF or anno(TSV) format',  default = 'vcf' )
+        return merge_hotspot_parser
+        
     filter_parser = _create_filter_parser(subparsers)
     filter_parser.set_defaults(func = run_filter)
+    merge_hotspot_parser = _create_merge_hotspot_parser(subparsers)
+    merge_hotspot_parser.set_defaults(func = run_merge_hotspot)
     return parser
