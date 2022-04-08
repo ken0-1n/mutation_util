@@ -75,6 +75,11 @@ def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, 
     vcf_writer = vcf.Writer(open(output_file, 'w'), vcf_reader)
 
     for record in vcf_reader:
+
+        # hotspot(LOD of score) is exist
+        if "LS" in record.INFO: 
+            vcf_writer.write_record(record)
+
         # TODO EBCall
         # FP:  Fisher's Test
         # FPR: Fisher's Test processed with Realignment
@@ -82,17 +87,13 @@ def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, 
         # B1R: 10% posterior quantile Processed with Realignment
         # NAR: Number of allelic reads (Tumor)|(Sample1)
         # NAR: Number of allelic reads (Normal)|(Sample2)
-        if (( "FP" not in record.INFO or record.INFO["FP"]  >= float(fishpval))   and \
+        elif (( "FP" not in record.INFO or record.INFO["FP"]  >= float(fishpval))   and \
             ( "EB" not in record.INFO or record.INFO["EB"] >= float(ebpval)) and \
             ( "FPR" not in record.INFO or (record.INFO["FPR"] != None and record.INFO["FPR"] >= float(realignpval))) and \
             ( "B10" not in record.INFO or record.INFO["B10"] >= float(post10q))    and \
             ( "B1R" not in record.INFO or (record.INFO["B1R"] != None and record.INFO["B1R"] >= float(r_post10q)))  and \
             ( sample1 == None or (record.genotype(sample1)["NAR"] != None and record.genotype(sample1)["NAR"] >= int(tcount)))   and \
             ( sample2 == None or (record.genotype(sample2)["NAR"] != None and record.genotype(sample2)["NAR"] <= int(ncount)))):
-            vcf_writer.write_record(record)
-
-        # hotspot(LOD of score) is exist
-        elif "LS" in record.INFO: 
             vcf_writer.write_record(record)
 
     vcf_writer.close()
