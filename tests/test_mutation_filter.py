@@ -28,6 +28,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 100
         v_count = 100
         hotspot_database = ""
+        flag_mis_base_0 = True
             
         mf.filter_mutation_list( \
             input, \
@@ -41,7 +42,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             v_count, \
             hotspot_database, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test1_1.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -62,6 +64,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 100
         v_count = 100
         hotspot_database = ""
+        flag_mis_base_0 = True
             
         mf.filter_mutation_list( \
             input, \
@@ -75,7 +78,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             v_count, \
             hotspot_database, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test1_2.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -97,6 +101,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 0.1
         v_count = 4
         hotspot_database = ""
+        flag_mis_base_0 = True
             
         mf.filter_mutation_list( \
             input, \
@@ -110,7 +115,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             v_count, \
             hotspot_database, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test2_1.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -132,6 +138,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 0.1
         v_count = 4
         hotspot_database = ""
+        flag_mis_base_0 = True
             
         mf.filter_mutation_list( \
             input, \
@@ -145,7 +152,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             v_count, \
             hotspot_database, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test2_2.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -170,6 +178,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 100
         sample1 = "5929_tumor"
         sample2 = "5929_control"
+        flag_mis_base_0 = True
         
         mf.filter_mutation_vcf( \
             input, \
@@ -183,7 +192,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             sample1, \
             sample2, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test3_1.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -204,6 +214,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 100
         sample1 = "5929_tumor"
         sample2 = "5929_control"
+        flag_mis_base_0 = True
         
         mf.filter_mutation_vcf( \
             input, \
@@ -217,7 +228,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             sample1, \
             sample2, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test3_2.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -238,6 +250,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 0.1
         sample1 = "5929_tumor"
         sample2 = None
+        flag_mis_base_0 = True
         
         mf.filter_mutation_vcf( \
             input, \
@@ -251,7 +264,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             sample1, \
             sample2, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
 
         answer_file = cur_dir + "/../data/5929_small_result_test4_1.txt"
@@ -274,6 +288,7 @@ class TestMutationFilter(unittest.TestCase):
         r_post10q = 0.1
         sample1 = "5929_tumor"
         sample2 = None
+        flag_mis_base_0 = True
         
         mf.filter_mutation_vcf( \
             input, \
@@ -287,7 +302,8 @@ class TestMutationFilter(unittest.TestCase):
             r_post10q, \
             sample1, \
             sample2, \
-            ghi)
+            ghi, \
+            flag_mis_base_0)
 
 
         answer_file = cur_dir + "/../data/5929_small_result_test4_2.txt"

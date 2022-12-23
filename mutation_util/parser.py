@@ -34,6 +34,9 @@ def create_parser():
         filter_parser.add_argument( '-1', '--sample1', help = '1st sample name ( disease )', type = str, default = None)
         filter_parser.add_argument( '-2', '--sample2', help = '2nd sample name ( control )', type = str, default = None)
         filter_parser.add_argument( '-O', '--print_format', choices = ['vcf','anno'], help = 'Print VCF or anno(TSV) format',  default = 'anno' )
+        filter_parser.add_argument( '-D', '--flag_mis_base_0', help = 'Ignore the fisher threshold when the number of mismatches is 0 in normal bam.', action = 'store_true', default = False )
+        
+
         return filter_parser
         
     def _create_merge_hotspot_parser(subparsers):

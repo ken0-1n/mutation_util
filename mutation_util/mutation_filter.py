@@ -3,7 +3,7 @@ import vcf
 
 
 ###############################################
-def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, hotspot_database, ghi):
+def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, hotspot_database, ghi, flag_mis_base_0):
 
     # genomon header idx infomation object
     hout = open(output_file, 'w')
@@ -50,9 +50,9 @@ def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval,
             F = line.split('\t')
             key = str(F[ghi.chr]) +"\t"+ str(F[ghi.start]) +"\t"+ str(F[ghi.end]) +"\t"+ F[ghi.ref].upper() +"\t"+ F[ghi.alt].upper()
 
-            if (( ghi.fisher == -1 or (float(F[ghi.fisher]) >= float(fishpval) or int(F[ghi.nvariant]) == 0)) and \
+            if (( ghi.fisher == -1 or (float(F[ghi.fisher]) >= float(fishpval) or (int(F[ghi.nvariant]) == 0 and flag_mis_base_0 == True))) and \
                 ( ghi.ebcall == -1 or float(F[ghi.ebcall]) >= float(ebpval))   and \
-                ( ghi.realign == -1 or (F[ghi.realign] != "---" and (float(F[ghi.realign]) >= float(realignpval) or int(F[ghi.ncount]) == 0))) and \
+                ( ghi.realign == -1 or (F[ghi.realign] != "---" and (float(F[ghi.realign]) >= float(realignpval) or (int(F[ghi.ncount]) == 0) and flag_mis_base_0 == True))) and \
                 ( ghi.tcount == -1 or  (F[ghi.tcount] != "---" and int(F[ghi.tcount]) >= int(tcount))) and \
                 ( ghi.ncount == -1 or  (F[ghi.ncount] != "---" and int(F[ghi.ncount]) <= int(ncount))) and \
                 ( ghi.post10q == -1 or float(F[ghi.post10q]) >= float(post10q)) and \
@@ -69,7 +69,7 @@ def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval,
     hout.close()
 
 ###############################################
-def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, sample1, sample2, ghi):
+def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, sample1, sample2, ghi, flag_mis_base_0):
 
     vcf_reader = vcf.Reader(filename = input_file)
     vcf_writer = vcf.Writer(open(output_file, 'w'), vcf_reader)
@@ -87,9 +87,9 @@ def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, 
         # B1R: 10% posterior quantile Processed with Realignment
         # NAR: Number of allelic reads (Tumor)|(Sample1)
         # NAR: Number of allelic reads (Normal)|(Sample2)
-        elif (( "FP" not in record.INFO or (record.INFO["FP"]  >= float(fishpval) or record.genotype(sample2)["AD"] == 0))   and \
+        elif (( "FP" not in record.INFO or (record.INFO["FP"]  >= float(fishpval) or (record.genotype(sample2)["AD"] == 0 and flag_mis_base_0 == True)))   and \
             ( "EB" not in record.INFO or record.INFO["EB"] >= float(ebpval)) and \
-            ( "FPR" not in record.INFO or (record.INFO["FPR"] != None and (record.INFO["FPR"] >= float(realignpval) or record.genotype(sample2)["NAR"] == 0))) and \
+            ( "FPR" not in record.INFO or (record.INFO["FPR"] != None and (record.INFO["FPR"] >= float(realignpval) or (record.genotype(sample2)["NAR"] == 0  and flag_mis_base_0 == True)))) and \
             ( "B10" not in record.INFO or record.INFO["B10"] >= float(post10q))    and \
             ( "B1R" not in record.INFO or (record.INFO["B1R"] != None and record.INFO["B1R"] >= float(r_post10q)))  and \
             ( sample1 == None or (record.genotype(sample1)["NAR"] != None and record.genotype(sample1)["NAR"] >= int(tcount)))   and \
@@ -97,4 +97,5 @@ def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, 
             vcf_writer.write_record(record)
 
     vcf_writer.close()
+    
 
