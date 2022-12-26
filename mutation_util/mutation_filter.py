@@ -69,7 +69,7 @@ def filter_mutation_list(input_file, output_file, ebpval, fishpval, realignpval,
     hout.close()
 
 ###############################################
-def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, sample1, sample2, ghi, flag_mis_base_0):
+def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, tcount, ncount, post10q, r_post10q, v_count, sample1, sample2, ghi, flag_mis_base_0):
 
     vcf_reader = vcf.Reader(filename = input_file)
     vcf_writer = vcf.Writer(open(output_file, 'w'), vcf_reader)
@@ -87,14 +87,29 @@ def filter_mutation_vcf(input_file, output_file, ebpval, fishpval, realignpval, 
         # B1R: 10% posterior quantile Processed with Realignment
         # NAR: Number of allelic reads (Tumor)|(Sample1)
         # NAR: Number of allelic reads (Normal)|(Sample2)
-        elif (( "FP" not in record.INFO or (record.INFO["FP"]  >= float(fishpval) or (record.genotype(sample2)["AD"] == 0 and flag_mis_base_0 == True)))   and \
-            ( "EB" not in record.INFO or record.INFO["EB"] >= float(ebpval)) and \
-            ( "FPR" not in record.INFO or (record.INFO["FPR"] != None and (record.INFO["FPR"] >= float(realignpval) or (record.genotype(sample2)["NAR"] == 0  and flag_mis_base_0 == True)))) and \
-            ( "B10" not in record.INFO or record.INFO["B10"] >= float(post10q))    and \
-            ( "B1R" not in record.INFO or (record.INFO["B1R"] != None and record.INFO["B1R"] >= float(r_post10q)))  and \
-            ( sample1 == None or (record.genotype(sample1)["NAR"] != None and record.genotype(sample1)["NAR"] >= int(tcount)))   and \
-            ( sample2 == None or (record.genotype(sample2)["NAR"] != None and record.genotype(sample2)["NAR"] <= int(ncount)))):
-            vcf_writer.write_record(record)
+        
+        
+        else:
+            # single mode 
+            if sample2 == None:
+            
+                if \
+                ( "EB" not in record.INFO or record.INFO["EB"] >= float(ebpval)) and \
+                ( record.INFO["B10"] >= float(post10q))  and \
+                ( record.INFO["B1R"] != None and (record.INFO["B1R"] >= float(r_post10q)))  and \
+                ( record.genotype(sample1)["NAR"] != None and record.genotype(sample1)["NAR"] >= int(v_count)):
+                    vcf_writer.write_record(record)
+            
+            # pair mode
+            else:
+        
+                if \
+                ( "EB" not in record.INFO or record.INFO["EB"] >= float(ebpval)) and \
+                ( record.INFO["FP"] >= float(fishpval) or (record.genotype(sample2)["AD"] == 0 and flag_mis_base_0 == True))   and \
+                ( record.INFO["FPR"] != None and (record.INFO["FPR"] >= float(realignpval) or (record.genotype(sample2)["NAR"] == 0  and flag_mis_base_0 == True))) and \
+                ( record.genotype(sample1)["NAR"] != None and record.genotype(sample1)["NAR"] >= int(tcount))   and \
+                ( record.genotype(sample2)["NAR"] != None and record.genotype(sample2)["NAR"] <= int(ncount)):
+                    vcf_writer.write_record(record)
 
     vcf_writer.close()
     

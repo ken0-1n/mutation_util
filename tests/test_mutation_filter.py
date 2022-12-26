@@ -174,6 +174,7 @@ class TestMutationFilter(unittest.TestCase):
         realignpval = 1.0
         tcount = 4
         ncount = 2
+        v_count = 4
         post10q = 100
         r_post10q = 100
         sample1 = "5929_tumor"
@@ -190,6 +191,7 @@ class TestMutationFilter(unittest.TestCase):
             ncount, \
             post10q, \
             r_post10q, \
+            v_count, \
             sample1, \
             sample2, \
             ghi, \
@@ -210,6 +212,7 @@ class TestMutationFilter(unittest.TestCase):
         realignpval = 1.0
         tcount = 4
         ncount = 2
+        v_count = 4
         post10q = 100
         r_post10q = 100
         sample1 = "5929_tumor"
@@ -226,6 +229,7 @@ class TestMutationFilter(unittest.TestCase):
             ncount, \
             post10q, \
             r_post10q, \
+            v_count, \
             sample1, \
             sample2, \
             ghi, \
@@ -248,6 +252,7 @@ class TestMutationFilter(unittest.TestCase):
         ncount = 100
         post10q = 0.1
         r_post10q = 0.1
+        v_count = 4
         sample1 = "5929_tumor"
         sample2 = None
         flag_mis_base_0 = True
@@ -262,6 +267,7 @@ class TestMutationFilter(unittest.TestCase):
             ncount, \
             post10q, \
             r_post10q, \
+            v_count, \
             sample1, \
             sample2, \
             ghi, \
@@ -286,6 +292,7 @@ class TestMutationFilter(unittest.TestCase):
         ncount = 100
         post10q = 0.1
         r_post10q = 0.1
+        v_count = 4
         sample1 = "5929_tumor"
         sample2 = None
         flag_mis_base_0 = True
@@ -300,6 +307,7 @@ class TestMutationFilter(unittest.TestCase):
             ncount, \
             post10q, \
             r_post10q, \
+            v_count, \
             sample1, \
             sample2, \
             ghi, \
