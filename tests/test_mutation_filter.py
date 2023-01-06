@@ -29,7 +29,11 @@ class TestMutationFilter(unittest.TestCase):
         v_count = 100
         hotspot_database = ""
         flag_mis_base_0 = True
-            
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
+        
         mf.filter_mutation_list( \
             input, \
             output, \
@@ -43,7 +47,12 @@ class TestMutationFilter(unittest.TestCase):
             v_count, \
             hotspot_database, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test1_1.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -65,6 +74,10 @@ class TestMutationFilter(unittest.TestCase):
         v_count = 100
         hotspot_database = ""
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
             
         mf.filter_mutation_list( \
             input, \
@@ -79,11 +92,105 @@ class TestMutationFilter(unittest.TestCase):
             v_count, \
             hotspot_database, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test1_2.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
 
+    def test1_3(self):
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+        "--fish_pval 1.0 --realign_pval 1.0 --eb_pval 4.0 --tcount 4 --ncount 2"
+        ghi = genomon_header_info.Genomon_header_info()
+        input = cur_dir + "/../data/5929_small_realignment_result_test1.3.txt"
+        output = cur_dir + "/../data/5929_small_result_test1_3.txt"
+        ebpval = 4.0 
+        fishpval = 1.0
+        realignpval = 1.0
+        tcount = 4
+        ncount = 2
+        post10q = None
+        r_post10q = None
+        v_count = None
+        hotspot_database = ""
+        flag_mis_base_0 = True
+        fishpval_base_0 = 0.4
+        realignpval_base_0 = 0.4
+        ncount_other = 10
+        ncount_depth = 8
+            
+        mf.filter_mutation_list( \
+            input, \
+            output, \
+            ebpval, \
+            fishpval, \
+            realignpval, \
+            tcount, \
+            ncount, \
+            post10q, \
+            r_post10q, \
+            v_count, \
+            hotspot_database, \
+            ghi, \
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
+
+        answer_file = cur_dir + "/../data/5929_small_result_answer_test1_3.txt"
+        self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
+        
+    def test1_4(self):
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+        "--fish_pval 1.0 --realign_pval 1.0 --eb_pval 4.0 --tcount 4 --ncount 2"
+        ghi = genomon_header_info.Genomon_header_info()
+        input = cur_dir + "/../data/5929_small_realignment_result_test1.4.txt"
+        output = cur_dir + "/../data/5929_small_result_test1_4.txt"
+        ebpval = 4.0 
+        fishpval = 1.0
+        realignpval = 1.0
+        tcount = 4
+        ncount = 2
+        post10q = None
+        r_post10q = None
+        v_count = None
+        hotspot_database = ""
+        flag_mis_base_0 = False
+        fishpval_base_0 = 0.4
+        realignpval_base_0 = 0.4
+        ncount_other = 10
+        ncount_depth = 8
+            
+        mf.filter_mutation_list( \
+            input, \
+            output, \
+            ebpval, \
+            fishpval, \
+            realignpval, \
+            tcount, \
+            ncount, \
+            post10q, \
+            r_post10q, \
+            v_count, \
+            hotspot_database, \
+            ghi, \
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
+
+        answer_file = cur_dir + "/../data/5929_small_result_answer_test1_4.txt"
+        self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
 
     def test2_1(self):
         cur_dir = os.path.dirname(os.path.abspath(__file__))
@@ -102,6 +209,10 @@ class TestMutationFilter(unittest.TestCase):
         v_count = 4
         hotspot_database = ""
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
             
         mf.filter_mutation_list( \
             input, \
@@ -116,7 +227,12 @@ class TestMutationFilter(unittest.TestCase):
             v_count, \
             hotspot_database, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test2_1.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -128,7 +244,7 @@ class TestMutationFilter(unittest.TestCase):
         "--post10q 0.1 --r_post10q 0.1 --count 4"
         ghi = genomon_header_info.Genomon_header_info()
         input = cur_dir + "/../data/5929_small_realignment_result_test2.2.txt"
-        output = cur_dir + "/../data/5929_small_result_answer_test2_2.txt"
+        output = cur_dir + "/../data/5929_small_result_test2_2.txt"
         ebpval = 100 
         fishpval = 100
         realignpval = 100
@@ -139,6 +255,10 @@ class TestMutationFilter(unittest.TestCase):
         v_count = 4
         hotspot_database = ""
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
             
         mf.filter_mutation_list( \
             input, \
@@ -153,11 +273,60 @@ class TestMutationFilter(unittest.TestCase):
             v_count, \
             hotspot_database, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test2_2.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
 
+    def test2_3(self):
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+        "--post10q 0.1 --r_post10q 0.1 --count 4"
+        ghi = genomon_header_info.Genomon_header_info()
+        input = cur_dir + "/../data/5929_small_realignment_result_test2.3.txt"
+        output = cur_dir + "/../data/5929_small_result_test2_3.txt"
+        ebpval = 4.0 
+        fishpval = None
+        realignpval = None
+        tcount = None
+        ncount = None
+        post10q = 0.1
+        r_post10q = 0.1
+        v_count = 4
+        hotspot_database = ""
+        flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
+            
+        mf.filter_mutation_list( \
+            input, \
+            output, \
+            ebpval, \
+            fishpval, \
+            realignpval, \
+            tcount, \
+            ncount, \
+            post10q, \
+            r_post10q, \
+            v_count, \
+            hotspot_database, \
+            ghi, \
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
+
+        answer_file = cur_dir + "/../data/5929_small_result_answer_test2_3.txt"
+        self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))        
 
     ######################################
     # Tumor/Normal Pair, VCF format
@@ -180,6 +349,10 @@ class TestMutationFilter(unittest.TestCase):
         sample1 = "5929_tumor"
         sample2 = "5929_control"
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
         
         mf.filter_mutation_vcf( \
             input, \
@@ -195,7 +368,12 @@ class TestMutationFilter(unittest.TestCase):
             sample1, \
             sample2, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test3_1.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
@@ -218,6 +396,10 @@ class TestMutationFilter(unittest.TestCase):
         sample1 = "5929_tumor"
         sample2 = "5929_control"
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
         
         mf.filter_mutation_vcf( \
             input, \
@@ -233,9 +415,108 @@ class TestMutationFilter(unittest.TestCase):
             sample1, \
             sample2, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
         answer_file = cur_dir + "/../data/5929_small_result_answer_test3_2.txt"
+        self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
+
+    def test3_3(self):
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+        "--fish_pval 1.0 --realign_pval 1.0 --eb_pval 4.0 --tcount 4 --ncount 2"
+        ghi = genomon_header_info.Genomon_header_info()
+        input = cur_dir + "/../data/5929_small_realignment_result_test3.3.txt"
+        output = cur_dir + "/../data/5929_small_result_test3_3.txt"
+        ebpval = 4.0 
+        fishpval = 1.0
+        realignpval = 1.0
+        tcount = 4
+        ncount = 2
+        v_count = 4
+        post10q = 100
+        r_post10q = 100
+        sample1 = "5929_tumor"
+        sample2 = "5929_control"
+        flag_mis_base_0 = True
+        fishpval_base_0 = 0.4
+        realignpval_base_0 = 0.4
+        ncount_other = 10
+        ncount_depth = 8
+        
+        mf.filter_mutation_vcf( \
+            input, \
+            output, \
+            ebpval, \
+            fishpval, \
+            realignpval, \
+            tcount, \
+            ncount, \
+            post10q, \
+            r_post10q, \
+            v_count, \
+            sample1, \
+            sample2, \
+            ghi, \
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
+
+        answer_file = cur_dir + "/../data/5929_small_result_answer_test3_3.txt"
+        self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
+
+    def test3_4(self):
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+        "--fish_pval 1.0 --realign_pval 1.0 --eb_pval 4.0 --tcount 4 --ncount 2"
+        ghi = genomon_header_info.Genomon_header_info()
+        input = cur_dir + "/../data/5929_small_realignment_result_test3.4.txt"
+        output = cur_dir + "/../data/5929_small_result_test3_4.txt"
+        ebpval = 4.0 
+        fishpval = 1.0
+        realignpval = 1.0
+        tcount = 4
+        ncount = 2
+        v_count = 4
+        post10q = 100
+        r_post10q = 100
+        sample1 = "5929_tumor"
+        sample2 = "5929_control"
+        flag_mis_base_0 = False
+        fishpval_base_0 = 0.4
+        realignpval_base_0 = 0.4
+        ncount_other = 10
+        ncount_depth = 8
+        
+        mf.filter_mutation_vcf( \
+            input, \
+            output, \
+            ebpval, \
+            fishpval, \
+            realignpval, \
+            tcount, \
+            ncount, \
+            post10q, \
+            r_post10q, \
+            v_count, \
+            sample1, \
+            sample2, \
+            ghi, \
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
+
+        answer_file = cur_dir + "/../data/5929_small_result_answer_test3_4.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
 
     def test4_1(self):
@@ -256,6 +537,10 @@ class TestMutationFilter(unittest.TestCase):
         sample1 = "5929_tumor"
         sample2 = None
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
         
         mf.filter_mutation_vcf( \
             input, \
@@ -271,7 +556,12 @@ class TestMutationFilter(unittest.TestCase):
             sample1, \
             sample2, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
 
         answer_file = cur_dir + "/../data/5929_small_result_test4_1.txt"
@@ -296,6 +586,10 @@ class TestMutationFilter(unittest.TestCase):
         sample1 = "5929_tumor"
         sample2 = None
         flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
         
         mf.filter_mutation_vcf( \
             input, \
@@ -311,12 +605,64 @@ class TestMutationFilter(unittest.TestCase):
             sample1, \
             sample2, \
             ghi, \
-            flag_mis_base_0)
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
 
 
         answer_file = cur_dir + "/../data/5929_small_result_test4_2.txt"
         self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
 
+    def test4_3(self):
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+
+        "--post10q 0.1 --r_post10q 0.1 --count 4"
+        ghi = genomon_header_info.Genomon_header_info()
+        input = cur_dir + "/../data/5929_small_realignment_result_test4.3.txt"
+        output = cur_dir + "/../data/5929_small_result_test4_3.txt"
+        ebpval = 4.0 
+        fishpval = None
+        realignpval = None
+        tcount = None
+        ncount = None
+        post10q = 0.1
+        r_post10q = 0.1
+        v_count = 4
+        sample1 = "5929_tumor"
+        sample2 = None
+        flag_mis_base_0 = True
+        fishpval_base_0 = 0.0
+        realignpval_base_0 = 0.0
+        ncount_other = 10000
+        ncount_depth = 0
+        
+        mf.filter_mutation_vcf( \
+            input, \
+            output, \
+            ebpval, \
+            fishpval, \
+            realignpval, \
+            tcount, \
+            ncount, \
+            post10q, \
+            r_post10q, \
+            v_count, \
+            sample1, \
+            sample2, \
+            ghi, \
+            flag_mis_base_0, \
+            fishpval_base_0, \
+            realignpval_base_0, \
+            ncount_other, \
+            ncount_depth
+            )
+
+
+        answer_file = cur_dir + "/../data/5929_small_result_test4_3.txt"
+        self.assertTrue(filecmp.cmp(output, answer_file, shallow=False))
 
     def test5_1(self):
         

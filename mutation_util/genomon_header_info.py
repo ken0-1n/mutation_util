@@ -2,27 +2,29 @@ class Genomon_header_info:
 
     def __init__(self):
     
-        self.fisher = -1
-        self.ebcall = -1
-        self.realign = -1
-        self.tcount = -1
-        self.ncount = -1
-        self.post10q = -1
-        self.r_post10q = -1
-        self.v_count = -1
-        self.chr = -1
-        self.start = -1
-        self.end = -1
-        self.ref = -1
-        self.alt = -1
-        self.func = -1
-        self.gene = -1
-        self.tumor_barcode = -1
-        self.tdepth = -1
-        self.tvariant = -1
-        self.ndepth = -1
-        self.nvariant = -1
-        self.score_hotspot = -1
+        self.fisher = None
+        self.ebcall = None
+        self.realign = None
+        self.tcount = None
+        self.ncount = None
+        self.ncount_ref = None
+        self.ncount_other = None
+        self.post10q = None
+        self.r_post10q = None
+        self.v_count = None
+        self.chr = None
+        self.start = None
+        self.end = None
+        self.ref = None
+        self.alt = None
+        self.func = None
+        self.gene = None
+        self.tumor_barcode = None
+        self.tdepth = None
+        self.tvariant = None
+        self.ndepth = None
+        self.nvariant = None
+        self.score_hotspot = None
    
     def set_header_information(self,header):
         F = header.rstrip('\n').split('\t')
@@ -37,6 +39,10 @@ class Genomon_header_info:
                 self.tcount = i
             elif v == "variantPairNum_normal":
                 self.ncount = i
+            elif v == "readPairNum_normal":
+                self.ncount_ref= i
+            elif v == "otherPairNum_normal":
+                self.ncount_other = i
             elif v == "10%_posterior_quantile":
                 self.post10q = i
             elif v == "10%_posterior_quantile(realignment)":

@@ -35,6 +35,10 @@ def create_parser():
         filter_parser.add_argument( '-2', '--sample2', help = '2nd sample name ( control )', type = str, default = None)
         filter_parser.add_argument( '-O', '--print_format', choices = ['vcf','anno'], help = 'Print VCF or anno(TSV) format',  default = 'anno' )
         filter_parser.add_argument( '-D', '--flag_mis_base_0', help = 'Ignore the fisher threshold when the number of mismatches is 0 in normal bam.', action = 'store_true', default = False )
+        filter_parser.add_argument( '-F', '--fish_pval_base_0', help = 'Fisher test P-value when the number of mismatches is 0 in normal bam.', type = float, default = 0.0)
+        filter_parser.add_argument( '-R', '--realign_pval_base_0', help = 'Realignment Fisher test P-value when the number of mismatches is 0 in normal bam.', type = float, default = 0.0)
+        filter_parser.add_argument( '-N', '--ncount_depth', help = "minimum depth of normal", type = int, default = 0)
+        filter_parser.add_argument( '-E', '--ncount_other', help = 'maximum other read count of normal', type = int, default = 1000000)
         
 
         return filter_parser
